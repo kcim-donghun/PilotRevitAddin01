@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<RevitAddIns>
+    <AddIn Type="Command">
+        <Text>Command PilotRevitAddin01</Text>
+        <Description> 파일럿 프로젝트 1</Description>
+        <Assembly>PilotRevitAddin01.dll</Assembly>
+        <FullClassName>PilotRevitAddin01.Command</FullClassName>
+        <ClientId>103d8541-df75-4692-acfd-0f07ac5b8ade</ClientId>
+        <VendorId> KCIM </VendorId>
+        <VendorDescription> 이동훈 </VendorDescription>
+    </AddIn>
+    <AddIn Type="Application">
+        <Name>Application PilotRevitAddin01</Name>
+        <Assembly>PilotRevitAddin01.dll</Assembly>
+        <FullClassName>PilotRevitAddin01.App</FullClassName>
+        <ClientId>d62a861f-fe3b-4aba-b3bc-17a9493e30e3</ClientId>
+        <VendorId> KCIM </VendorId>
+        <VendorDescription> 이동훈 </VendorDescription>
+    </AddIn>
+</RevitAddIns>
