@@ -20,6 +20,9 @@ namespace PilotRevitAddin01
         public static UIApplication application = null;
         System.Windows.Forms.Form form = null;
 
+        private IntPtr _revit_window; // 2019
+
+
 
         public Result Execute(
           ExternalCommandData commandData,
@@ -31,11 +34,17 @@ namespace PilotRevitAddin01
             Autodesk.Revit.ApplicationServices.Application app = uiapp.Application;
             Document doc = uidoc.Document;
 
+            
+            _revit_window = uiapp.MainWindowHandle; // 2019
+            IWin32Window revit_window = new JtWindowHandle(uiapp.MainWindowHandle);
+
+
             try
             {
                 form = new ListForm(doc);
+                form.StartPosition = FormStartPosition.CenterParent;
                 //form.Show();
-                form.ShowDialog();
+                form.ShowDialog(revit_window);
                 return Result.Succeeded;
             }
             catch (Exception ex)

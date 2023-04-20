@@ -54,11 +54,16 @@ namespace PilotRevitAddin01
             datatable2.Columns.Add("파라미터명", typeof(string));
             datatable2.Columns.Add("값", typeof(string));
             datatable2.Columns.Add("Parameter", typeof(Parameter));
+            datatable2.Columns.Add("IsReadOnly", typeof(bool));
+            datatable2.Columns.Add("StorageType", typeof(StorageType));
 
             dataGridView2.DataSource = datatable2;
             dataGridView2.Columns["Parameter"].Visible = false;
+            dataGridView2.Columns["IsReadOnly"].Visible = false;
+            dataGridView2.Columns["StorageType"].Visible = false;
 
             dataGridView2.Columns[0].ReadOnly = true;
+
 
             DataColumn[] dtkey = new DataColumn[1];
             dtkey[0] = new DataColumn("ParameterID", typeof(int));
@@ -67,6 +72,7 @@ namespace PilotRevitAddin01
             changeValueDataTable.Columns.Add("newValue", typeof(string));
             changeValueDataTable.Columns.Add("RowIndex", typeof(int));
             changeValueDataTable.PrimaryKey = dtkey;
+
 
             this.dataGridView1.DoubleBuffered(true);
             this.dataGridView2.DoubleBuffered(true);
@@ -150,50 +156,30 @@ namespace PilotRevitAddin01
             //bool isSave = SetParameter(selectParameter, datatable2.Rows[e.RowIndex][1].ToString());
         }
 
-        private void button_save_Click_1(object sender, EventArgs e)
-        {
-            TaskDialog dialog = new TaskDialog("파라미터 저장");
-            dialog.MainContent = $" {changeValueDataTable.Rows.Count} 개 파라미터 저장 시작 ";
-            dialog.AllowCancellation = true;
-            dialog.CommonButtons = TaskDialogCommonButtons.Yes | TaskDialogCommonButtons.No;
-
-            TaskDialogResult result = dialog.Show();
-            if (result == TaskDialogResult.Yes)
-            {
-                int saveCount = 0;
-                for (int i = 0; i < changeValueDataTable.Rows.Count; i++)
-                {
-                    var param = (Parameter)changeValueDataTable.Rows[i][1];
-                    string val = changeValueDataTable.Rows[i][2].ToString();
-
-                    int rowIndex = (int)changeValueDataTable.Rows[i][3];
-                    dataGridView2.Rows[rowIndex].Cells[1].Style.BackColor = System.Drawing.Color.White;
-
-                    bool isSave = SetParameter(param, val);
-
-                    if (isSave) { saveCount++; }
-                }
-                TaskDialog.Show("파라미터 저장", $" {saveCount}개 저장!");
-            }
-        }
 
         private void dataGridView2_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
         {
+            /*
             if (e.RowIndex < 0) return;
             DataGridViewRow row = dataGridView2.Rows[e.RowIndex];
-            Parameter p = (Parameter)row.Cells[2].Value;
-            if (p.IsReadOnly == true)
+
+            
+            //Parameter p = (Parameter)row.Cells[2].Value;
+
+            if (dataGridView2.Rows[e.RowIndex].Cells["IsReadOnly"].Value.Equals(true))
             {
                 row.Cells[0].Style.ForeColor = System.Drawing.Color.Red;
                 row.Cells[1].Style.ForeColor = System.Drawing.Color.Red;
                 row.Cells[1].ReadOnly = true;
             }
-            if (p.StorageType == StorageType.ElementId)
+            
+            if (dataGridView2.Rows[e.RowIndex].Cells["StorageType"].Value.Equals(((int)StorageType.ElementId)))
             {
                 row.Cells[0].Style.ForeColor = System.Drawing.Color.Blue;
                 row.Cells[1].Style.ForeColor = System.Drawing.Color.Blue;
                 row.Cells[1].ReadOnly = true;
             }
+            */
 
         }
 
@@ -205,11 +191,27 @@ namespace PilotRevitAddin01
             foreach (Parameter param in seleElement.Parameters)
             {
                 string[] arrPara = GetParameterInformation(param, Doc);
-                datatable2.Rows.Add(arrPara[0], arrPara[1], param);
+                datatable2.Rows.Add(arrPara[0], arrPara[1], param, param.IsReadOnly, param.StorageType);
             }
             dataGridView2.DataSource = datatable2;
 
             changeValueDataTable.Rows.Clear();
+
+            for(int i = 0; i < datatable2.Rows.Count; i++)
+            {
+                if (dataGridView2.Rows[i].Cells["IsReadOnly"].Value.Equals(true))
+                {
+                    dataGridView2.Rows[i].Cells[0].Style.ForeColor = System.Drawing.Color.Red;
+                    dataGridView2.Rows[i].Cells[1].Style.ForeColor = System.Drawing.Color.Red;
+                    dataGridView2.Rows[i].Cells[1].ReadOnly = true;
+                }
+                if (dataGridView2.Rows[i].Cells["StorageType"].Value.Equals(((int)StorageType.ElementId)))
+                {
+                    dataGridView2.Rows[i].Cells[0].Style.ForeColor = System.Drawing.Color.Blue;
+                    dataGridView2.Rows[i].Cells[1].Style.ForeColor = System.Drawing.Color.Blue;
+                    dataGridView2.Rows[i].Cells[1].ReadOnly = true;
+                }
+            }
         }
 
         public bool SetParameter(Parameter parameter, string value)
@@ -223,11 +225,8 @@ namespace PilotRevitAddin01
                     switch (parameter.StorageType)
                     {
                         case StorageType.Double:
-                            double double_val = 0;
-                            if (Double.TryParse(value, out double_val))
-                            {
-                                result = parameter.Set(double_val);
-                            }
+                            result = parameter.SetValueString(value);
+                            
                             break;
                         case StorageType.ElementId:
 
@@ -348,17 +347,22 @@ namespace PilotRevitAddin01
 
         private void button_save_Click(object sender, EventArgs e)
         {
+            int count = changeValueDataTable.Rows.Count;
+
             TaskDialog dialog = new TaskDialog("파라미터 저장");
-            dialog.MainContent = $" {changeValueDataTable.Rows.Count} 개 파라미터 저장 시작 ";
+            dialog.MainContent = $" {count} 개 파라미터 저장 시작 ";
             dialog.AllowCancellation = true;
             dialog.CommonButtons = TaskDialogCommonButtons.Yes | TaskDialogCommonButtons.No;
-
             TaskDialogResult result = dialog.Show();
+
+            //DialogResult result1 = MessageBox.Show("파라미터 저장", $" {count} 개 파라미터 저장 시작 ", MessageBoxButtons.YesNo);
+            //if (result1 == DialogResult.Yes)    
+
             if (result == TaskDialogResult.Yes)
             {
                 int saveCount = 0;
                 int notsaveCount = 0;
-                for (int i = 0; i < changeValueDataTable.Rows.Count; i++)
+                for (int i = 0; i < count; i++)
                 {
                     var param = (Parameter)changeValueDataTable.Rows[i][1];
                     string val = changeValueDataTable.Rows[i][2].ToString();
@@ -376,6 +380,7 @@ namespace PilotRevitAddin01
                     }
                 }
                 TaskDialog.Show("파라미터 저장", $" {saveCount}개 저장 , {notsaveCount}개 오류!");
+                //MessageBox.Show("파라미터 저장", $" {saveCount}개 저장 , {notsaveCount}개 오류!");
 
                 changeValueDataTable.Rows.Clear();
             }

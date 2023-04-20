@@ -5,9 +5,11 @@ using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Reflection;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Media.Imaging;
 
 #endregion
@@ -57,5 +59,19 @@ namespace PilotRevitAddin01
                 Int32Rect.Empty,
                 BitmapSizeOptions.FromEmptyOptions());
         }
+    }
+
+
+    public class JtWindowHandle : IWin32Window
+    {
+        public JtWindowHandle(IntPtr h)
+        {
+            Debug.Assert(IntPtr.Zero != h,
+                "expected non-null window handle");
+
+            Handle = h;
+        }
+
+        public IntPtr Handle { get; }
     }
 }
