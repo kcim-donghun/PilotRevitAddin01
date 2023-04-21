@@ -16,12 +16,10 @@ namespace PilotRevitAddin01
     [Transaction(TransactionMode.Manual)]
     public class Command : IExternalCommand
     {
-        public static Document doc = null;
-        public static UIApplication application = null;
+        //public static Document doc = null;
+        //public static UIApplication application = null;
         System.Windows.Forms.Form form = null;
-
         private IntPtr _revit_window; // 2019
-
 
 
         public Result Execute(
@@ -43,8 +41,8 @@ namespace PilotRevitAddin01
             {
                 form = new ListForm(doc);
                 form.StartPosition = FormStartPosition.CenterParent;
-                //form.Show();
-                form.ShowDialog(revit_window);
+                form.Show(revit_window);
+                //form.ShowDialog(revit_window);
                 return Result.Succeeded;
             }
             catch (Exception ex)

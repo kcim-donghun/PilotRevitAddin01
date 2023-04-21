@@ -12,6 +12,7 @@ using System.Windows.Forms;
 using Autodesk.Revit.DB;
 using Autodesk.Revit.UI;
 using System.Reflection;
+using Autodesk.Revit.Creation;
 
 namespace PilotRevitAddin01
 {
@@ -119,7 +120,17 @@ namespace PilotRevitAddin01
             datatable1.Rows.Clear();
             foreach (Element element in elements)
             {
-                datatable1.Rows.Add(element.Id.ToString(), element.Category.Name, element.Name, element.GetType().Name, element);
+                string eleTypeName = "";
+                
+                //eleTypeName = element.GetType().Name;
+                
+                ElementType elemType01 = Doc.GetElement(element.GetTypeId()) as ElementType;
+                if (elemType01 != null)
+                {
+                    eleTypeName = elemType01.FamilyName;
+                }
+                
+                datatable1.Rows.Add(element.Id.ToString(), element.Category.Name, element.Name, eleTypeName, element);
             }
             dataGridView1.DataSource = datatable1;
         }
@@ -383,6 +394,25 @@ namespace PilotRevitAddin01
                 //MessageBox.Show("파라미터 저장", $" {saveCount}개 저장 , {notsaveCount}개 오류!");
 
                 changeValueDataTable.Rows.Clear();
+            }
+        }
+
+        private void dataGridView2_Sorted(object sender, EventArgs e)
+        {
+            for (int i = 0; i < dataGridView2.Rows.Count; i++)
+            {
+                if (dataGridView2.Rows[i].Cells["IsReadOnly"].Value.Equals(true))
+                {
+                    dataGridView2.Rows[i].Cells[0].Style.ForeColor = System.Drawing.Color.Red;
+                    dataGridView2.Rows[i].Cells[1].Style.ForeColor = System.Drawing.Color.Red;
+                    dataGridView2.Rows[i].Cells[1].ReadOnly = true;
+                }
+                if (dataGridView2.Rows[i].Cells["StorageType"].Value.Equals(((int)StorageType.ElementId)))
+                {
+                    dataGridView2.Rows[i].Cells[0].Style.ForeColor = System.Drawing.Color.Blue;
+                    dataGridView2.Rows[i].Cells[1].Style.ForeColor = System.Drawing.Color.Blue;
+                    dataGridView2.Rows[i].Cells[1].ReadOnly = true;
+                }
             }
         }
     }

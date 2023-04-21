@@ -187,8 +187,8 @@
             this.dataGridView2.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.CellSelect;
             this.dataGridView2.Size = new System.Drawing.Size(455, 645);
             this.dataGridView2.TabIndex = 5;
-            //this.dataGridView2.CellPainting += new System.Windows.Forms.DataGridViewCellPaintingEventHandler(this.dataGridView2_CellPainting);
             this.dataGridView2.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.dataGridView2_CellValueChanged);
+            this.dataGridView2.Sorted += new System.EventHandler(this.dataGridView2_Sorted);
             // 
             // ListForm
             // 
@@ -200,7 +200,6 @@
             this.Controls.Add(this.panelBottom);
             this.Name = "ListForm";
             this.Text = "ListForm";
-            //this.Shown += new System.EventHandler(this.applicationEventsInfoWindows_Shown);
             this.panelTop.ResumeLayout(false);
             this.panelTop.PerformLayout();
             this.panelBottom.ResumeLayout(false);
